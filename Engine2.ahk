@@ -8,9 +8,17 @@
  * 4、此功能库使用yaml做为配置文件的保存、读取和执行
 */
 GUI,Test:+hwndaa
+GUI,Test:Font, s9, Microsoft YaHei
 SR_Engine_Load("Test",10)
 SR_Engine_Show()
-SR_Engine_HideControl()
+return
+f1::
+  SR_Engine_HideControl()
+return
+f2::
+  n:=1
+  SR_Engine_ShowTab%n%()
+  SR_Engine_Exec(v:=SR_Engine_ShowTab1_Save())
 return
 
 TestGUIClose:
@@ -28,25 +36,136 @@ SR_Engine_Interpret("{window:dir}",Save)
 变量
 SRE_GUIName: 功能库界面名，方便功能块嵌入
 SRE_Handle: 功能库界面的Handle
-SRE_Object: 功能库界面保存
+SRE_Object: 功能库界面保存到数据（按数据结构）
+*/
+
+/*
+数据结构:
+Method: Run
+  File: ''
+  WorkingDir: ''
+  Param: ''
+  State: '0|1|2|3' 
+--- 0为正常运行; 1为最小化运行; 2为最大化运行; 3为隐藏运行
+
+Method: RunWait
+  File: ''
+  WorkingDir: ''
+  Param: ''
+  State: '0|1|2|3' 
+--- 0为正常运行; 1为最小化运行; 2为最大化运行; 3为隐藏运行
+
+Method: WinActivate
+  Class: ''
+  Title: ''
+  fuzzy: False
+  Wait: 0
+
+Method: WinResize
+  Width: 0
+  Height: 0
+
+Method: WinMove
+  X: 0
+  Y: 0
+
+Method: WinMaximize
+  Class: ''
+  Title: ''
+  fuzzy: False
+Method: WinMinimize
+  Class: ''
+  Title: ''
+  fuzzy: False
+Method: WinRestore
+  Class: ''
+  Title: ''
+  fuzzy: False
+Method: AlwayOnTop
+  Class: ''
+  Title: ''
+  fuzzy: False
+
+Method: SendMessage
+  Class: ''
+  Title: ''
+  fuzzy: False
+  Message: 0
+  WParam:
+  LParam:
+
+Method: Send
+  HK1: '{down 10}'
+  HK2: '{s 30}'
+  HK3: '+{TAB 4}'
+
+Method: Input
+  String: ''
+
+Method: Click
+  X: 0
+  Y: 0
+  Count: 1
+  Key: 'Right'
+
+Method: Sleep
+  Time: 0
+
+Method: Label
+  Sub: ''
+
+Method: Function
+  Name: ''
+
+暂不支持：
+Method: AHK
+  Script: ''
 */
 
 ; SR_Engine_Load(GUIName="SRE",y=10) {{{1
 ; 此函数用于加载界面库
 ; 需要提供界面名称，默认为SR_Engine
-SR_Engine_Load(GUIName="SRE",y=10)
+SR_Engine_Load(GUIName="SRE",yy=10)
 {
   Global SRE_GUIName
-         ,SRE_ListView_Step
-         ,SRE_Button_Add,SRE_Button_Del,SRE_Button_Up,SRE_Button_Down
+        ,SRE_ListView_Step,SER_DDL_Method
+        ,SRE_Tab1_Edit1,SRE_Tab1_Edit2,SRE_Tab1_Edit3,SRE_Tab1_DDL
   SRE_GUIName := GUIName
-  GUI,%SRE_GUIName%:Add,ListView,w484 h100 x10  y%y% hwndSRE_ListView_Step
-  y+=110
-  GUI,%SRE_GUIName%:Add,Button  ,w40  h26 x10  y%y% hwndSRE_Button_Add,Add
-  GUI,%SRE_GUIName%:Add,Button  ,w40  h26 x60  y%y% hwndSRE_Button_Del,Del
-  GUI,%SRE_GUIName%:Add,Button  ,w40  h26 x110 y%y% hwndSRE_Button_Up,Up
-  GUI,%SRE_GUIName%:Add,Button  ,w40  h26 x160 y%y% hwndSRE_Button_Down,Down
-  GUI,%SRE_GUIName%:Default
+  CH := "运行`n"
+      . "运行并等待"
+  y := yy
+  GUI,%SRE_GUIName%:+Delimiter`n
+  GUI,%SRE_GUIName%:Add,ListView,w200 h400 x10  y%y% hwndSRE_ListView_Step, 步骤
+  y+=5
+  GUI,%SRE_GUIName%:Add,Text,w200 h28  x225 y%y% ,命令(&D)：
+  y-=2
+  GUI,%SRE_GUIName%:Add,DDL,w200 h28 x285 y%y% hwndSRE_DDL_Methd r10 ,% CH
+  y+=40
+  GUI,%SRE_GUIName%:Add,Text,w260 h50 x225 y%y% border
+  y+=5
+  GUI,%SRE_GUIName%:Add,Text,w256 h40 x227 y%y% center
+  y+=54
+  GUI,%SRE_GUIName%:Add,Tab2,w300 h420 x210 y%y% Bottom buttons,Run
+  GUI,%SRE_GUIName%:Add,GroupBox,w260 h280 x225 y%y%
+  y+=16
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,文件/文件夹:(&E)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab1_Edit1
+  y+=30
+  GUI,%SRE_GUIName%:Add,Button,w90 h26 x285 y%y%,浏览文件(&F)
+  GUI,%SRE_GUIName%:Add,Button,w90 h26 x385 y%y%,浏览文件夹(&D)
+  y+=40
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,参数:(&P)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab1_Edit2
+  y+=35
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,工作目录:(&W)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab1_Edit3
+  y+=35
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,运行方式:(&M)
+  y+=20
+  GUI,%SRE_GUIName%:Add,DDL,w240 h26 x235 r4 y%y%  hwndSRE_Tab1_DDL,正常运行`n最小化运行`n最大化运行`n隐藏运行
 }
 
 ; SR_Engine_Show(option,title="StarRed Engine") {{{1
@@ -56,23 +175,38 @@ SR_Engine_Show(option="",title="StarRed Engine")
   Global SRE_Object,SRE_GUIName
   SRE_Object := yaml("",False)
   GUI,%SRE_GUIName%:+hwndSRE_Handle
-  GUI,%SRE_GUIName%:Show,%option%,%title%
+  GUI,%SRE_GUIName%:Show,w500 h420 %option%,%title%
 }
-
-
+; 界面切换 {{{1
+; SR_Engine_HideControl() {{{2
 SR_Engine_HideControl()
 {
   Global SRE_GUIName
-         ,SRE_ListView_Step
-         ,SRE_Button_Add,SRE_Button_Del,SRE_Button_Up,SRE_Button_Down
   GUI,%SRE_GUIName%:Default
-  GuiControl,Hide,%SRE_ListView_Step%
-  GuiControl,Hide,%SRE_Button_Add%
-  GuiControl,Hide,%SRE_Button_Del%
-  GuiControl,Hide,%SRE_Button_Up%
-  GuiControl,Hide,%SRE_Button_Down%
+  GUIControl,Hide,SysTabControl321
+  GUIControl,Hide,SysTabControl322
 }
 
+; SR_Engine_ShowTab1() {{{2
+SR_Engine_ShowTab1()
+{
+  Global SRE_GUIName
+  GUI,%SRE_GUIName%:Default
+  GUIControl,Show,SysTabControl321
+}
+; SR_Engine_ShowTab1_Save() {{{2
+SR_Engine_ShowTab1_Save()
+{
+  Global SRE_Tab1_Edit1,SRE_Tab1_Edit2,SRE_Tab1_Edit3,SRE_Tab1_DDL
+  v := yaml("",0)
+  v.add("Method: Run")
+  v.add("File: ")
+  v.add("Param: ")
+  v.add("WorkingDir: ")
+  v.add("State: 2")
+  v.file := "Notepad"
+  return v
+}
 
 ; SR_Engine_Interpret() {{{1
 ; 适用于Run/RunWait
@@ -802,82 +936,248 @@ EscapeSwitch(switch){
 ; SR_Engine_Exec() {{{1
 ; 此函数负责执行配置
 ; Object: 保存配置内容，根据设置执行对应的功能
-SR_Engine_Exec(Object,Level=1)
+SR_Engine_Exec(Object)
 {
+  Global SR_Save
+  If not Isobject(SR_Save)
+    SR_Save := []
+  If RegExMatch(Object.Method,"i)^Run$")
+  {
+    Target := Object.file Object.Param
+    wDir := Object.WorkingDir
+    If Object.State = 1
+      Run,%Target%,%wDir%,Min UseErrorLevel
+    Else If Object.State = 2
+      Run,%Target%,%wDir%,Max UseErrorLevel
+    Else If Object.State = 3
+      Run,%Target%,%wDir%,Hide UseErrorLevel
+    Else
+      Run,%Target%,%wDir%,UseErrorLevel
+  }
+  If RegExMatch(Object.Method,"i)^RunWait$")
+  {
+    Target := Object.file Object.Param
+    wDir := Object.WorkingDir
+    If Object.State = 1
+      RunWait,%Target%,%wDir%,Min UseErrorLevel
+    Else If Object.State = 2
+      RunWait,%Target%,%wDir%,Max UseErrorLevel
+    Else If Object.State = 3
+      RunWait,%Target%,%wDir%,Hide UseErrorLevel
+    Else
+      RunWait,%Target%,%wDir%,UseErrorLevel
+  }
+  If RegExMatch(Object.Method,"i)^WinActivate$")
+  {
+    If Strlen(c:=Object.Class)
+    {
+      If (s:=Object.Wait)
+        WinWait,ahk_class %c%,,%s%
+      WinActivate,ahk_class %c%
+    }
+    Else
+    {
+      If Object.Fuzzy
+      {
+        TMM := A_TitleMatchMode
+        SetTitleMatchMode, 2
+      }
+      t := Object.Title
+      If (s:=Object.Wait)
+        WinWait,%t%,,%s%
+      WinActivate,%t%
+      If Object.Fuzzy
+        SetTitleMatchMode, %TMM%
+    }
+  }
+  If RegExMatch(Object.Method,"i)^WinMaximize$")
+  {
+    If Strlen(c:=Object.Class)
+      WinMaximize,ahk_class %c%
+    Else
+    {
+      If Object.Fuzzy
+      {
+        TMM := A_TitleMatchMode
+        SetTitleMatchMode, 2
+      }
+      t := Object.Title
+      WinMaximize,%t%
+      If Object.Fuzzy
+        SetTitleMatchMode, %TMM%
+    }
+  }
+  If RegExMatch(Object.Method,"i)^WinMinimize$")
+  {
+    If Strlen(c:=Object.Class)
+      WinMinimize,ahk_class %c%
+    Else
+    {
+      If Object.Fuzzy
+      {
+        TMM := A_TitleMatchMode
+        SetTitleMatchMode, 2
+      }
+      t := Object.Title
+      WinMinimize,%t%
+      If Object.Fuzzy
+        SetTitleMatchMode, %TMM%
+    }
+  }
+  If RegExMatch(Object.Method,"i)^WinRestore$")
+  {
+    If Strlen(c:=Object.Class)
+    {
+      WinRestore,ahk_class %c%
+      WinGet,hwnd,ID,ahk_class %c%
+      x := SR_Save[hwnd A_Tab "x"]
+      y := SR_Save[hwnd A_Tab "y"]
+      w := SR_Save[hwnd A_Tab "w"]
+      h := SR_Save[hwnd A_Tab "h"]
+      WinMove,ahk_class %c%,, %x%, %y%, %w%, %h%
+    }
+    Else
+    {
+      If Object.Fuzzy
+      {
+        TMM := A_TitleMatchMode
+        SetTitleMatchMode, 2
+      }
+      t := Object.Title
+      WinRestore,%t%
+      WinGet,hwnd,ID,%t%
+      x := SR_Save[hwnd A_Tab "x"]
+      y := SR_Save[hwnd A_Tab "y"]
+      w := SR_Save[hwnd A_Tab "w"]
+      h := SR_Save[hwnd A_Tab "h"]
+      WinMove,%t%,, %x%, %y%, %w%, %h%
+      If Object.Fuzzy
+        SetTitleMatchMode, %TMM%
+    }
+  }
+  If RegExMatch(Object.Method,"i)^WinResize$")
+  {
+    WinGet,hwnd,ID,A
+    WinGetPos,SaveX,SaveY,SaveW,SaveH,ahk_id %hwnd%
+    SR_Save[hwnd A_Tab "x"] := SaveX
+    SR_Save[hwnd A_Tab "y"] := SaveY
+    SR_Save[hwnd A_Tab "w"] := SaveW
+    SR_Save[hwnd A_Tab "h"] := SaveH
+    w := Object.Width
+    h := Object.Height
+    WinMove,ahk_id %hwnd%,,,, %w%, %h%
+  }
+  If RegExMatch(Object.Method,"i)^WinMove$")
+  {
+    WinGet,hwnd,ID,A
+    WinGetPos,SaveX,SaveY,SaveW,SaveH,ahk_id %hwnd%
+    SR_Save[hwnd A_Tab "x"] := SaveX
+    SR_Save[hwnd A_Tab "y"] := SaveY
+    SR_Save[hwnd A_Tab "w"] := SaveW
+    SR_Save[hwnd A_Tab "h"] := SaveH
+    x := Object.x
+    y := Object.y
+    WinMove,ahk_id %hwnd%,, %x%, %y%
+  }
+  If RegExMatch(Object.Method,"i)^AlwayOnTop$")
+  {
+    If Strlen(c:=Object.Class)
+      WinSet,AlwaysOnTop,Toggle,ahk_class %c%
+    Else
+    {
+      If Object.Fuzzy
+      {
+        TMM := A_TitleMatchMode
+        SetTitleMatchMode, 2
+      }
+      t := Object.Title
+      WinSet,AlwaysOnTop,Toggle,%t%
+      If Object.Fuzzy
+        SetTitleMatchMode, %TMM%
+    }
+  }
+  If RegExMatch(Object.Method,"i)^Input$")
+  {
+    string := Object.String
+    SendRaw,%string%
+  }
+  If RegExMatch(Object.Method,"i)^Sleep$")
+  {
+    Time := Object.Time
+    Sleep,%Time%
+  }
+  If RegExMatch(Object.Method,"i)^Click$")
+  {
+    Coordmode,Mouse,Screen
+    x := Object.x
+    y := Object.y
+    key := Object.key
+    count := Object.Count
+    Click,%x%,%y%,%key%,%count%
+  }
+  If RegExMatch(Object.Method,"i)^Send$")
+  {
+    Loop
+    {
+      If Not Strlen(Object["HK" A_Index])
+        Break
+      s := Object["HK" A_Index]
+      Send,%s%
+    }
+  }
+  If RegExMatch(Object.Method,"i)^SendMessage$")
+  {
+    Msg := Object.Message
+    wParam := Object.WParam
+    lParam := Object.LParam
+    If Strlen(c:=Object.Class)
+      SendMessage, Msg , wParam, lParam, , ahk_class %c%
+    Else
+    {
+      If Object.fuzzy
+      {
+        TMM := A_TitleMatchMode
+        SetTitleMatchMode, 2
+      }
+      t := Object.Title
+      SendMessage, Msg , wParam, lParam, , %t%
+      If Object.fuzzy
+        SetTitleMatchMode, %TMM%
+    }
+    
+  }
+  If RegExMatch(Object.Method,"i)^PostMessage$")
+  {
+    Msg := Object.Message
+    wParam := Object.WParam
+    lParam := Object.LParam
+    If Strlen(c:=Object.Class)
+      PostMessage, Msg , wParam, lParam, , ahk_class %c%
+    Else
+    {
+      If Object.fuzzy
+      {
+        TMM := A_TitleMatchMode
+        SetTitleMatchMode, 2
+      }
+      t := Object.Title
+      PostMessage, Msg , wParam, lParam, , %t%
+      If Object.fuzzy
+        SetTitleMatchMode, %TMM%
+    }
+  }
+  If RegExMatch(Object.Method,"i)^AHK$")
+  {
+    return
+  }
+  If RegExMatch(Object.Method,"i)^Label$")
+  {
+    If IsLabel(Sub := Object.Sub)
+      GoSub,%Sub%
+  }
+  If RegExMatch(Object.Method,"i)^Function$")
+  {
+    If Isfunc(name := Object.Name)
+      %Name%()
+  }
 }
-
-
-/*
-数据结构:
-
-Method: Run
-  File: ''
-  WorkingDir: ''
-  Param: ''
-  State: '0|1|2|3' 
---- 0为正常运行; 1为最小化运行; 2为最大化运行; 3为隐藏运行
-
-Method: RunWait
-  File: ''
-  WorkingDir: ''
-  Param: ''
-  State: '0|1|2|3' 
---- 0为正常运行; 1为最小化运行; 2为最大化运行; 3为隐藏运行
-
-Method: WinActivate
-  Class: ''
-  Title: ''
-  fuzzy: False
-  Wait: 0
-
-Method: WinResize
-  Width: 0
-  Height: 0
-
-Method: WinMove
-  X: 0
-  Y: 0
-
-Method: WinMaximize
-  Class: ''
-  Title: ''
-  fuzzy: False
-Method: WinMinimize
-  Class: ''
-  Title: ''
-  fuzzy: False
-Method: WinRestore
-  Class: ''
-  Title: ''
-  fuzzy: False
-Method: AlwayOnTop
-  Class: ''
-  Title: ''
-  fuzzy: False
-
-Method: SendMessage
-  Class: ''
-  Title: ''
-  fuzzy: False
-  Message: 0
-  WParam:
-  LParam:
-
-Method: Send
-  HK1: '{down 10}'
-  HK2: '{s 30}'
-  HK3: '+{TAB 4}'
-
-Method: Input
-  String: ''
-
-Method: Click
-  X: 0
-  Y: 0
-  Count: 1
-  Key: 'Right'
-
-Method: Sleep
-  Time: 0
-
-*/
