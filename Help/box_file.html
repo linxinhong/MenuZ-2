@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>{box:file}</title>
+<meta http-equiv="content-type" content="text/html; charset=GBK">
+<link href="./default.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+<h3>{box:file}<span class="ver"></span></h3>
+
+<p>此参数会打开文件选择窗口，选择文件作为参数</p>
+
+<h3>选项</h3>
+<table class="info">
+  <tr>
+    <td width="15%"> [>] </td>
+    <td width="85%"> 提示内容</td>
+  </tr>
+  <tr>
+    <td width="15%"> [&C:\*] </td>
+    <td width="85%"> 起始目录,必须以*结束</td>
+  </tr>
+  <tr>
+    <td width="15%"> [#Audio (*.wav; *.mp3)] </td>
+    <td width="85%"> 可选的文件类型。</td>
+  </tr>
+  <tr>
+    <td width="15%"> [M] </td>
+    <td width="85%"> 允许多选文件</td>
+  </tr>
+  <tr>
+    <td width="15%"> [file:] </td>
+    <td width="85%"> 可用于多选时格式化选择内容,必须在选项的最后</td>
+  </tr>
+</table>
+<h3>示例</h3>
+<pre class="NoIndent">
+菜单项的内容是:
+notepad.exe 可用于多选时格式化选择内容
+如：{box:file[M][>这是测试][file:"[P]" ]}
+会显示一个文件选择窗口，提示"这是测试",允
+许多选文件，按[file:"[P]" ]的格式返回选择内容
+</body>
+</html>

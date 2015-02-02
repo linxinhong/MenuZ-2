@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>{file:dir}</title>
+<meta http-equiv="content-type" content="text/html; charset=GBK">
+<link href="./default.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+<h3>{file:dir}<span class="ver"></span></h3>
+
+<p>此参数返回当前选择文件所在的文件夹</p>
+
+<pre class="Syntax">1、仅在当前选择内容为文件时，此参数才有效</pre>
+
+<h3>示例</h3>
+<pre class="NoIndent">假设当前选择的对象是文件:
+C:\dir\menuz.txt
+菜单项的内容是:
+cmd.exe {file:name}
+会被解析为:
+cmd.exe C:\dir</pre>
+</body>
+</html>

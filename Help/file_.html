@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>{file}</title>
+<meta http-equiv="content-type" content="text/html; charset=GBK">
+<link href="./default.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+<h3>{file}<span class="ver"></span></h3>
+
+<p>此参数按照文件模板定义的形式返回当前选择文件</p>
+
+<pre class="Syntax">1、仅在当前选择内容为文件时，此参数才有效。
+2、文件模板可以利用于多文件操作中，而单文件推荐使用{file:path}等参数</pre>
+<h3>过滤选项</h3>
+<table class="info">
+  <tr>
+    <td width="15%"> [@] </td>
+    <td width="85%"> 正则过滤[@\.txt$]</td>
+  </tr>
+  <tr>
+    <td width="15%"> [%] </td>
+    <td width="85%"> 序号过滤[%1,3-6]</td>
+  </tr>
+  <tr>
+    <td width="15%"> [=] </td>
+    <td width="85%"> 包含过滤[=mz],只允许文件名含有mz的文件</td>
+  </tr>
+  <tr>
+    <td width="15%"> [!] </td>
+    <td width="85%"> 不包含过滤[!mz],不允许所有文件名含有mz的文件</td>
+  </tr>
+  <tr>
+    <td width="15%"> [OF] </td>
+    <td width="85%"> 只允许文件</td>
+  </tr>
+  <tr>
+    <td width="15%"> [OD] </td>
+    <td width="85%"> 只允许目录</td>
+  </tr>
+</table>
+<h3>模板选项</h3>
+<table class="info">
+  <tr>
+    <td width="15%"> [P] </td>
+    <td width="85%"> 完整路径</td>
+  </tr>
+  <tr>
+    <td width="15%"> [F] </td>
+    <td width="85%"> 文件夹路径</td>
+  </tr>
+  <tr>
+    <td width="15%"> [N] </td>
+    <td width="85%"> 文件名</td>
+  </tr>
+  <tr>
+    <td width="15%"> [E] </td>
+    <td width="85%"> 扩展名</td>
+  </tr>
+  <tr>
+    <td width="15%"> [n] </td>
+    <td width="85%"> 不含扩展名的文件名</td>
+  </tr>
+  <tr>
+    <td width="15%"> [e] </td>
+    <td width="85%"> 磁盘盘符</td>
+  </tr>
+  <tr>
+    <td width="15%"> [CR] </td>
+    <td width="85%"> 回车</td>
+  </tr>
+  <tr>
+    <td width="15%"> [TAB] </td>
+    <td width="85%"> 制表符</td>
+  </tr>
+  <tr>
+    <td width="15%"> [I] </td>
+    <td width="85%"> 序号</td>
+  </tr>
+  <tr>
+    <td width="15%"> [II] </td>
+    <td width="85%"> 序号(补零)</td>
+  </tr>
+  <tr>
+    <td width="15%"> [C] </td>
+    <td width="85%"> 所有选择的文件总数</td>
+  </tr>
+  <tr>
+    <td width="15%"> [d] </td>
+    <td width="85%"> 当前日期</td>
+  </tr>
+  <tr>
+    <td width="15%"> [Y] </td>
+    <td width="85%"> 当前年份</td>
+  </tr>
+  <tr>
+    <td width="15%"> [M] </td>
+    <td width="85%"> 当前月份</td>
+  </tr>
+  <tr>
+    <td width="15%"> [D] </td>
+    <td width="85%"> 当前天数</td>
+  </tr>
+  <tr>
+    <td width="15%"> [t] </td>
+    <td width="85%"> 当前时间</td>
+  </tr>
+  <tr>
+    <td width="15%"> [h] </td>
+    <td width="85%"> 小时</td>
+  </tr>
+  <tr>
+    <td width="15%"> [m] </td>
+    <td width="85%"> 分钟</td>
+  </tr>
+  <tr>
+    <td width="15%"> [s] </td>
+    <td width="85%"> 秒数</td>
+  </tr>
+  <tr>
+    <td width="15%"> [<] </td>
+    <td width="85%"> 删除最后多余字符，如[<2] </td>
+  </tr>
+  <tr>
+    <td width="15%"> [#] </td>
+    <td width="85%"> 运行函数并返回内容</td>
+  </tr>
+  <tr>
+    <td width="15%"> \[ </td>
+    <td width="85%"> 左中括号</td>
+  </tr>
+  <tr>
+    <td width="15%"> \] </td>
+    <td width="85%"> 右中括号</td>
+  </tr>
+  <tr>
+    <td width="15%"> \{ </td>
+    <td width="85%"> 左大括号</td>
+  </tr>
+  <tr>
+    <td width="15%"> \} </td>
+    <td width="85%"> 右大括号</td>
+  </tr>
+</table>
+<h3>示例</h3>
+<pre class="NoIndent">假设当前选择的对象是文件:
+C:\dir\menuz.txt
+C:\dir\file.txt
+1)菜单项的内容是:
+notepad.exe "{file:[P];}"
+会被解析为:
+notepad.exe "c:\dir\menuz.txt;c:\dir\file.txt"
+2)菜单项的内容是:
+notepad.exe "{file:[N],}"
+会被解析为:
+notepad.exe "menuz.txt,file.txt"</pre>
+</body>
+</html>
