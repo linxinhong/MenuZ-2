@@ -1,4 +1,6 @@
-﻿#SingleInstance,force
+﻿
+
+#SingleInstance,force
 CoordMode,Mouse,Screen
 ; MD_Load {{{1
 Menu, Tray, Icon , %A_ScriptDir%\icons\menuz.icl, 1
@@ -33,14 +35,7 @@ for i , k in conf.hotkey
   Hotkey , %i%, MD_Init
 return
 
-#Include %A_ScriptDir%\Lib\MZ_API.ahk
-#Include %A_ScriptDir%\Lib\MZ_plugin.ahk
-#Include %A_ScriptDir%\Lib\PUM.ahk
-#Include %A_ScriptDir%\Lib\PUM_API.ahk
-#Include %A_ScriptDir%\Lib\winclip.ahk
-#Include %A_ScriptDir%\Lib\winclipAPI.ahk
-#Include %A_ScriptDir%\Lib\yaml.ahk
-#Include %A_ScriptDir%\Engine.ahk
+
 
 MD_Init:
   MD_Init()
@@ -49,17 +44,21 @@ return
 ; MD_Init() {{{1
 MD_Init()
 {
-  Global wclip,ppum,pmenu,conf,MD_hwnd,MD_Object,IsClass
+  Global wclip,ppum,pmenu,conf,MD_Object,MD_SaveSelect
   timeout := 1
   method  := 1
-  ;WinGet,MD_hwnd,ID,A
   MouseGetPos, px, py, MD_hwnd
   WinGetClass, MD_Class, ahk_id %MD_hwnd%
+  MD_SaveSelect := []
+  MD_SaveSelect["hwnd"] :=MD_hwnd
+  MD_SaveSelect["class"] := MD_Class
   IsClass := Not wclip.iCopy( timeout, method)
   pmenu :=  ppum.CreateMenu(MD_GetMenuParams(""))
   If wclip.iHasFormat(fmt_file:=15)
   {
     ext := iGetFileType(f:=wclip.iGetFiles())
+    MD_SaveSelect["type"] := 1
+    MD_SaveSelect["file"] := f
     Params := MD_GetMenuItemParams("")
     Params["name"] := MD_AdjustString(f,20)
     GetExtIcon(ext,file,num)
@@ -85,6 +84,7 @@ MD_Init()
   }
   Else If IsClass
   {
+    MD_SaveSelect["type"] := 0
     Params := MD_GetMenuItemParams("")
     Params["name"] := MD_AdjustString(conf.win_comment[MD_Class] ? conf.win_comment[MD_Class] : MD_Class ,20)
     winGet, file, ProcessPath, ahk_class %MD_Class%
@@ -111,6 +111,8 @@ MD_Init()
   Else
   {
     string := wclip.iGetText()
+    MD_SaveSelect["type"] := 2
+    MD_SaveSelect["text"] := string
     Params := MD_GetMenuItemParams("")
     Params["name"] := MD_AdjustString(string,20)
     Params["uid"] := {"type":"text","string":string}
@@ -158,18 +160,25 @@ MD_Init()
   Params["uid"] := "setting"
   pmenu.Add(Params)
   selected := pmenu.show(px,py)
-  Tooltip, ,,, 20
-  MD_object:=selected["uid"]
-  If RegExMatch(MD_Object.type,"i)^file$")
+  Tooltip
+  MD_Object:=selected["uid"]
+  If MD_Object.type = 1
     Clipboard := wclip.iGetFiles()
-  Else If RegExMatch(MD_Object.type,"i)^text$")
+  Else If MD_Object.type = 2
     Clipboard := wclip.iGetText()
   Else If MD_object = setting
     Run "%A_ahkPath%" "%A_ScriptDir%\GUI.ahk"
   Else
-    Engine(MD_Object)
-
+  {
+    SR_Engine_Interpret(MD_Object.String,MD_SaveSelect,True)
+  }
   wclip.iClear()
+}
+
+GetSaveSelect()
+{
+  Global MD_SaveSelect
+  return MD_SaveSelect
 }
 
 ; MD_Functions {{{1
@@ -316,7 +325,7 @@ MD_PumOut(msg,obj)
       Run "%A_ahkPath%" "%A_ScriptDir%\GUI.ahk"
     }
     Else
-      tooltip % yaml_dump(obj["uid"]),,,20
+      tooltip % LTrim(obj["uid"].string,">")
   }
 
 }
@@ -377,7 +386,11 @@ MD_AdjustString(String,Count){
     Return String
 }
 
-
-
-
-
+#Include %A_ScriptDir%\Lib\MZ_API.ahk
+#Include %A_ScriptDir%\Lib\MZ_plugin.ahk
+#Include %A_ScriptDir%\Lib\PUM.ahk
+#Include %A_ScriptDir%\Lib\PUM_API.ahk
+#Include %A_ScriptDir%\Lib\winclip.ahk
+#Include %A_ScriptDir%\Lib\winclipAPI.ahk
+#Include %A_ScriptDir%\Lib\yaml.ahk
+#Include %A_ScriptDir%\Engine2.ahk

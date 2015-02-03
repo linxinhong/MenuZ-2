@@ -9,46 +9,68 @@ hotkey:
   alt & z: 
 menu_class: 
   - 
-    filter: notepad;vim;
-    name: Editor
-  - 
-    - 
-      bgcolor: ''
-      bold: ''
-      icon: E:\Program Files\goagent\local\goagent.exe:0
-      name: GoAgent
-      string: E:\Program Files\goagent\local\goagent.exe
-      tcolor: ''
-    filter: Chrome_WidgetWin_1;
-    name: Chrome
-  - 
     - 
       bgcolor: 0xeeeeee
       bold: ''
       icon: %A_WINDIR%\system32\imageres.dll:146
-      name: 网络管理界面(&N)
+      name: 网络连接(&N)
       string: ncpa.cpl
       tcolor: ''
+      uid: 201501301357291
+    - 
+      bgcolor: 0xeeeeee
+      bold: ''
+      icon: %A_WINDIR%\system32\Shell32.dll:21
+      name: 打开《程序和功能》
+      string: appwiz.cpl
+      tcolor: ''
+      uid: 20150201000700
     - 
       bgcolor: 0xeeeeee
       bold: ''
       icon: %A_WINDIR%\System32\cmd.exe:0
-      name: 网络测试
+      name: &PING
       string: "ping {box:list[>\u8BF7\u9009\u62E9\u5730\u5740][www.baidu.com][www.qq.com]} -t"
       tcolor: ''
+      uid: 201501301357292
     filter: Shell_TrayWnd;
     name: 任务栏
 menu_default: 
   - 
+    - 
+      bgcolor: 0xeeeeee
+      bold: ''
+      icon: %ICONS%\copy.ico:0
+      name: 发送到D:\
+      string: ">{sendto:D:\\}"
+      tcolor: ''
+      uid: 20150130163022
+    - 
+      bgcolor: 0xeeeeee
+      bold: ''
+      icon: %ICONS%\Calendar.ico:0
+      name: 文件名后添加日期(&R)
+      string: ">{func:FT_AddDate} {ps:\u6B64func\u53EF\u4EE5\u81EA\u52A8\u5728\u6587\u4EF6\u540D\u5C3E\u90E8\u8FFD\u52A0\u65E5\u671F\uFF0C\u65E5\u671F\u683C\u5F0F\u4E3A\"-20150203\"}"
+      tcolor: ''
+      uid: 20150203112242
+    - 
+      bgcolor: 0xeeeeee
+      bold: ''
+      icon: ''
+      name: 文件名后增加版本(&V)
+      string: ">{func:FT_AddVer} {ps:\u6B64func\u53EF\u4EE5\u81EA\u52A8\u5728\u6587\u4EF6\u540D\u5C3E\u90E8\u589E\u52A0\u7248\u672C\u53F7\" Ver-1.0 \"\uFF0C\u5BF9\u540C\u4E00\u6587\u4EF6\u64CD\u4F5C\u53EF\u4EE5\u81EA\u52A8\u63D0\u5347\u7248\u672C\u53F7\uFF0C\u5982 \"Ver-1.1\"}"
+      tcolor: ''
+      uid: 20150203112145
     name: AnyFile
   - 
     - 
       bgcolor: 0xeeeeee
       bold: ''
-      icon: ''
+      icon: %ICONS%\baidu.ico:0
       name: 百度搜索(&B)
       string: "http://www.baidu.com/s?wd={select:[cp0]}"
       tcolor: ''
+      uid: 201501301357261
     - 
       bgcolor: 0xeeeeee
       bold: ''
@@ -56,62 +78,110 @@ menu_default:
       name: 必应搜索(&I)
       string: "http://cn.bing.com/search?q={select:[cp0]}"
       tcolor: ''
+      uid: 201501301357262
     - 
-      bgcolor: 0x309BA0
+      name: "----------"
+      uid: 201501301357263
+    - 
+      bgcolor: 0x91C7EE
       bold: ''
-      icon: %ICONS%\menuz.icl:12
-      name: 二维码(&R)
-      string: ">{do:MZ_QRCode}"
-      tcolor: 0xFFFFFF
+      icon: %ICONS%\baidu.ico:0
+      name: "\u5728\u7EBF\u7FFB\u8BD1[\u4E2D\u6587>\u82F1\u6587]  (&F)"
+      string: "http://fanyi.baidu.com/#zh/en/{select}"
+      tcolor: ''
+      uid: 201501301357274
     name: AnyText
   - 
     - 
-      bgcolor: ''
+      bgcolor: 0xeeeeee
       bold: ''
       icon: %A_WINDIR%\System32\shell32.dll:3
       name: 打开程序所在的路径
       string: "%A_windir%\\explorer.exe /n,/e,/select,{window:dir}"
       tcolor: ''
+      uid: 20150131225642
+    - 
+      bgcolor: 0xeeeeee
+      bold: ''
+      icon: %ICONS%\top.ico:0
+      name: 设置/取消顶置当前窗口(&T)
+      string: ">{do:AlwaysOnTop}"
+      tcolor: ''
+      uid: 201501301357272
     name: AnyClass
   - 
-    - 
-      bgcolor: ''
-      bold: ''
-      icon: %A_WINDIR%\System32\cmd.exe:0
-      name: 打开命令行
-      string: cmd.exe
-      tcolor: ''
     name: Any
 menu_file: 
   - 
     - 
       bgcolor: 0xeeeeee
       bold: 0
-      icon: E:\Program Files (x86)\WPS Office\9.1.0.4855\office6\wps.exe:0
+      icon: %ICONS%\wps.ico:0
       name: wps open
       string: "wps.exe \"{file:path}\""
       tcolor: ''
+      uid: 201501301357271
+    - 
+      bgcolor: 0xeeeeee
+      bold: ''
+      icon: %ICONS%\winword.ico:0
+      name: Word 打开
+      string: "winword.exe \"{file:path}\""
+      tcolor: ''
+      uid: 201501301357282
     filter: .doc;.docx;
-    name: "office file "
+    name: Office Word 文档
   - 
     - 
       bgcolor: 0x91C7EE
       bold: ''
-      icon: E:\Program Files (x86)\Vim\vim74\gvim.exe:0
-      name: GVIM编辑(&G)
-      string: "E:\\Program Files (x86)\\Vim\\vim74\\gvim.exe \"{file:path}\""
+      icon: %A_WINDIR%\notepad.exe:0
+      name: 记事本打开(&N)
+      string: "Notepad.exe \"{file:path}\""
       sub: 
       tcolor: ''
+      uid: 20150203091443
     - 
       bgcolor: 0xeeeeee
       bold: ''
-      icon: E:\PortableApps\Notepad++Portable\App\Notepad++\notepad++.exe:0
-      name: NPP打开(&P)
-      string: "E:\\PortableApps\\Notepad++Portable\\App\\Notepad++\\notepad++.exe \"{file:path}\""
+      icon: %ICONS%\wordpad.ico:0
+      name: 写字板打开
+      string: "wordpad.exe \"{file:path}\""
       tcolor: ''
-    filter: .txt;.ini;.yaml;.ahk;.pppt;
-    name: text file
+      uid: 201501301357282
+    filter: .txt;.ini;.yaml;.ahk;.rtf;
+    name: Text File
 menu_text: 
+  - 
+    - 
+      bgcolor: 0xeeeeee
+      bold: ''
+      icon: %ICONS%\email.ico:0
+      name: 发送邮件
+      string: "mailto:{select}"
+      tcolor: ''
+      uid: 201501301357281
+    filter: email;
+    name: 邮件地址
+  - 
+    - 
+      bgcolor: 0xeeeeee
+      bold: ''
+      icon: %ICONS%\ie.ico:0
+      name: IE打开(&I)
+      string: "iexplore.exe {select}"
+      tcolor: ''
+      uid: 201501301357281
+    - 
+      bgcolor: 0xeeeeee
+      bold: ''
+      icon: %ICONS%\chrome.ico:0
+      name: Chrome打开(&C)
+      string: "chrome.exe {select}"
+      tcolor: ''
+      uid: 201501301357282
+    filter: url;
+    name: 网站
 mz_color: 
   1: 15648657
   2: 8930024

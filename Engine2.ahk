@@ -1,5 +1,5 @@
-#Include Lib\MZ_API.ahk
-#Include Lib\Yaml.ahk
+;#Include Lib\MZ_API.ahk
+;#Include Lib\Yaml.ahk
 /*
  * 由于MenuZ\GestureZ\VimDesktop的需要，做一个统一的功能库
  * 1、类似StrokeIt里的命令集成，发挥AHK的优势
@@ -7,6 +7,8 @@
  * 3、此功能库是可扩展的，方便维护和使用的
  * 4、此功能库使用yaml做为配置文件的保存、读取和执行
 */
+
+/*
 GUI,Test:+hwndaa
 GUI,Test:Font, s9, Microsoft YaHei
 SR_Engine_Load("Test",10)
@@ -20,12 +22,7 @@ f2::
   SR_Engine_ShowTab%n%()
   SR_Engine_Exec(v:=SR_Engine_ShowTab1_Save())
 return
-
-TestGUIClose:
-  GUI,Test:Destroy
-  ;Msgbox % Yaml_Dump(SRE_Object,1)
-return
-
+*/
 /*
 WinGet,v,id,ahk_class Notepad
 save := {"hwnd":v}
@@ -208,18 +205,20 @@ SR_Engine_ShowTab1_Save()
   return v
 }
 
-; SR_Engine_Interpret() {{{1
+; SR_Engine_Interpret(String,Save) {{{1
 ; 适用于Run/RunWait
 ; 解析内容,返回解析完成的新内容
-SR_Engine_Interpret(String,Save)
+SR_Engine_Interpret(String,Save,Func=False)
 {
 /*
 Save
   Hwnd:
+  Class:
   Text:
   File:
   Type:
 */
+  Global MZ_Return
   ; 替换变量
   RunString := ReplaceEnv(LTrim(string,">"))
   ; 判断类型并获取相应的内容
@@ -255,18 +254,27 @@ Save
 				RtString := boxswitch(box)
       If RegExMatch(switch,"i)\{date[^\{\}]*\}",date)
 				RtString := dateswitch(date)
-			If RegExMatch(switch,"i)\{do:([^\{\}]*)\}",Func)
-			{
+      If Func
+      {
+			  If RegExMatch(switch,"i)\{func:([^\{\}]*)\}",Func)
+			  {
+          {
+            RtString := ""
+				    If Isfunc(Func1)
+					    RtString := %Func1%()
+            If IsLabel(Func1)
+            {
+              MZ_Return := ""
+              GoSub,%Func1%
+              RtString := MZ_Return
+            }
+          }
+			  }
+      }
+      Else If RegExMatch(switch,"i)\{func:([^\{\}]*)\}")
         RtString := ""
-				If Isfunc(Func1)
-					RtString := %Func1%()
-        If IsLabel(Func1)
-        {
-          MZ_Return := ""
-          GoSub,%Func1%
-          RtString := MZ_Return
-        }
-			}
+      If RegExMatch(switch,"i)\{ps:([^\{\}]*)\}")
+        RtString := ""
 			P1 := Pos + Strlen(switch)
 			RunString := SubStr(RunString,1,Pos-1) RtString Substr(RunString,P1)
 			P1 := Pos + Strlen(RtString)
