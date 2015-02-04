@@ -170,9 +170,19 @@ MD_Init()
     Run "%A_ahkPath%" "%A_ScriptDir%\GUI.ahk"
   Else
   {
-    SR_Engine_Interpret(MD_Object.String,MD_SaveSelect,True)
+    SR_Engine_Interpret(MD_Object.String,MD_SaveSelect,gofunc:=true,obj:=[])
+    SR_Engine_Exec(Obj)
   }
   wclip.iClear()
+}
+StrPutVar(string, ByRef var, encoding)
+{
+    ; 确定容量.
+    VarSetCapacity( var, StrPut(string, encoding)
+        ; StrPut 返回字符数, 但 VarSetCapacity 需要字节数.
+        * ((encoding="utf-16"||encoding="cp1200") ? 2 : 1) )
+    ; 复制或转换字符串.
+    return StrPut(string, &var, encoding)
 }
 
 GetSaveSelect()

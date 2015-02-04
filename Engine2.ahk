@@ -1,5 +1,4 @@
-;#Include Lib\MZ_API.ahk
-;#Include Lib\Yaml.ahk
+
 /*
  * 由于MenuZ\GestureZ\VimDesktop的需要，做一个统一的功能库
  * 1、类似StrokeIt里的命令集成，发挥AHK的优势
@@ -8,26 +7,6 @@
  * 4、此功能库使用yaml做为配置文件的保存、读取和执行
 */
 
-/*
-GUI,Test:+hwndaa
-GUI,Test:Font, s9, Microsoft YaHei
-SR_Engine_Load("Test",10)
-SR_Engine_Show()
-return
-f1::
-  SR_Engine_HideControl()
-return
-f2::
-  n:=1
-  SR_Engine_ShowTab%n%()
-  SR_Engine_Exec(v:=SR_Engine_ShowTab1_Save())
-return
-*/
-/*
-WinGet,v,id,ahk_class Notepad
-save := {"hwnd":v}
-SR_Engine_Interpret("{window:dir}",Save)
-*/
 
 /*
 变量
@@ -78,7 +57,7 @@ Method: WinRestore
   Class: ''
   Title: ''
   fuzzy: False
-Method: AlwayOnTop
+Method: AlwaysOnTop
   Class: ''
   Title: ''
   fuzzy: False
@@ -92,9 +71,7 @@ Method: SendMessage
   LParam:
 
 Method: Send
-  HK1: '{down 10}'
-  HK2: '{s 30}'
-  HK3: '+{TAB 4}'
+  Hotkey: '{down 10}'
 
 Method: Input
   String: ''
@@ -124,45 +101,321 @@ Method: AHK
 ; 需要提供界面名称，默认为SR_Engine
 SR_Engine_Load(GUIName="SRE",yy=10)
 {
-  Global SRE_GUIName
-        ,SRE_ListView_Step,SER_DDL_Method
+  Global SRE_GUIName,SRE_Array_method:=[]
+        ,SRE_ListView_Step,SRE_DDL_Method,SRE_Text_Main,SRE_Button_Save
         ,SRE_Tab1_Edit1,SRE_Tab1_Edit2,SRE_Tab1_Edit3,SRE_Tab1_DDL
+        ,SRE_Tab2_Edit1,SRE_Tab2_Edit2,SRE_Tab2_Edit3,SRE_Tab2_Button
+        ,SRE_Tab3_Edit1,SRE_Tab3_Edit2
+        ,SRE_Tab4_Edit1,SRE_Tab4_Edit2
+        ,SRE_Tab5_Edit1,SRE_Tab5_Edit2,SRE_Tab5_Button
+        ,SRE_Tab6_Edit1,SRE_Tab6_Edit2,SRE_Tab6_Buttnn
+        ,SRE_Tab7_Edit1,SRE_Tab7_Edit2,SRE_Tab7_Buttnn
+        ,SRE_Tab8_Edit1,SRE_Tab8_Edit2,SRE_Tab8_Buttnn
+        ,SRE_Tab9_Edit1,SRE_Tab9_Edit2,SRE_Tab9_Buttnn,SRE_Tab9_Edit3,SRE_Tab9_Edit4,SRE_Tab9_Edit5
+        ,SRE_Tab10_Edit1,SRE_Tab10_Edit2,SRE_Tab10_Buttnn,SRE_Tab10_Edit3,SRE_Tab10_Edit4,SRE_Tab10_Edit5
+        ,SRE_Tab11_Edit1
+        ,SRE_Tab12_Edit1
+        ,SRE_Tab13_Edit1,SRE_Tab13_Edit2,SRE_Tab13_Edit3,SRE_Tab13_Edit4
+        ,SRE_Tab14_Edit1
+        ,SRE_Tab15_Edit1
+        ,SRE_Tab16_Edit1
   SRE_GUIName := GUIName
+  
   CH := "运行`n"
-      . "运行并等待"
+      . "运行并等待`n"
+      . "激活指定窗口`n"
+      . "调整窗口`n"
+      . "移动窗口`n"
+      . "最大化窗口`n"
+      . "最小化窗口`n"
+      . "还原窗口`n"
+      . "顶置窗口`n"
+      . "SendMessage`n"
+      . "PostMessage`n"
+      . "发送热键`n"
+      . "发送文本`n"
+      . "点击鼠标`n"
+      . "延时`n"
+      . "转到Label`n"
+      . "执行Function"
+      
+  SRE_Array_method["Run"]:=1
+  SRE_Array_method["RunWait"]:=2
+  SRE_Array_method["WinActivate"]:=3
+  SRE_Array_method["WinResize"]:=4
+  SRE_Array_method["WinMove"]:=5
+  SRE_Array_method["WinMaximize"]:=6
+  SRE_Array_method["WinMinimize"]:=7
+  SRE_Array_method["WinRestore"]:=8
+  SRE_Array_method["AlwaysOnTop"]:=9
+  SRE_Array_method["SendMessage"]:=10
+  SRE_Array_method["PostMessage"]:=11
+  SRE_Array_method["Send"]:=12
+  SRE_Array_method["Input"]:=13
+  SRE_Array_method["Click"]:=14
+  SRE_Array_method["Sleep"]:=15
+  SRE_Array_method["Label"]:=16
+  SRE_Array_method["Function"]:=17
+  
   y := yy
   GUI,%SRE_GUIName%:+Delimiter`n
-  GUI,%SRE_GUIName%:Add,ListView,w200 h400 x10  y%y% hwndSRE_ListView_Step, 步骤
+  GUI,%SRE_GUIName%:Add,ListView,w200 h430 x10  y%y% hwndSRE_ListView_Step -ReadOnly gSR_Engine_LV AltSubmit NoSort, 步骤
   y+=5
   GUI,%SRE_GUIName%:Add,Text,w200 h28  x225 y%y% ,命令(&D)：
-  y-=2
-  GUI,%SRE_GUIName%:Add,DDL,w200 h28 x285 y%y% hwndSRE_DDL_Methd r10 ,% CH
+  y-=3
+  GUI,%SRE_GUIName%:Add,DDL,w200 h28 x285 y%y% hwndSRE_DDL_Method r18  AltSubmit gSR_Engine_ChangeUI,% CH
   y+=40
   GUI,%SRE_GUIName%:Add,Text,w260 h50 x225 y%y% border
   y+=5
-  GUI,%SRE_GUIName%:Add,Text,w256 h40 x227 y%y% center
-  y+=54
-  GUI,%SRE_GUIName%:Add,Tab2,w300 h420 x210 y%y% Bottom buttons,Run
-  GUI,%SRE_GUIName%:Add,GroupBox,w260 h280 x225 y%y%
+  GUI,%SRE_GUIName%:Add,Text,w256 h40 x227 y%y% center hwndSRE_Text_Main
+  y+=360
+  GUI,%SRE_GUIName%:Add,Button,w80 h26 x310 y%y% center gSR_Engine_SaveModify,帮助(&H)
+  GUI,%SRE_GUIName%:Add,Button,w80 h26 x406 y%y% center hwndSRE_Button_Save gSR_Engine_SaveModify,应用(&A)
+  ; Run 或者 RunWait {{{2
+  y:=yy+94
+  GUI,%SRE_GUIName%:Add,Tab2,w300 h420 x210 y%y% Bottom buttons Hidden,Run
+  GUI,%SRE_GUIName%:Add,GroupBox,w260 h298 x225 y%y%
   y+=16
   GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,文件/文件夹:(&E)
   y+=20
-  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab1_Edit1
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab1_Edit1 gSR_Engine_SaveButtonState
   y+=30
   GUI,%SRE_GUIName%:Add,Button,w90 h26 x285 y%y%,浏览文件(&F)
   GUI,%SRE_GUIName%:Add,Button,w90 h26 x385 y%y%,浏览文件夹(&D)
   y+=40
   GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,参数:(&P)
   y+=20
-  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab1_Edit2
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab1_Edit2 gSR_Engine_SaveButtonState
   y+=35
   GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,工作目录:(&W)
   y+=20
-  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab1_Edit3
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab1_Edit3  gSR_Engine_SaveButtonState
   y+=35
   GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,运行方式:(&M)
+  y+=26
+  GUI,%SRE_GUIName%:Add,DDL,w240 h26 x235 r4 y%y%  hwndSRE_Tab1_DDL AltSubmit Choose1 gSR_Engine_SaveButtonState,正常运行`n最小化运行`n最大化运行`n隐藏运行 
+  ; WinActivate {{{2
+  y:=yy+94
+  GUI,%SRE_GUIName%:Add,Tab2,w300 h420 x210 y%y% Bottom Buttons Hidden ,WinActivate
+  y+=7
+  GUI,%SRE_GUIName%:Add,GroupBox,w260 h230 x225 y%y%
+  y+=16
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,窗口类(&C)
   y+=20
-  GUI,%SRE_GUIName%:Add,DDL,w240 h26 x235 r4 y%y%  hwndSRE_Tab1_DDL,正常运行`n最小化运行`n最大化运行`n隐藏运行
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab2_Edit1  gSR_Engine_SaveButtonState
+  y+=36
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,窗口标题:(&T)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab2_Edit2   gSR_Engine_SaveButtonState
+  y+=36
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,超时时间:(&T)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab2_Edit3   gSR_Engine_SaveButtonState
+  y+=36
+  GUI,%SRE_GUIName%:Add,CheckBox,h26 x235 y%y% hwndSRE_Tab2_Button ,模糊匹配标题文本(&M) 
+  ; WinResize {{{2
+  y:=yy+94
+  GUI,%SRE_GUIName%:Add,Tab2,w300 h420 x210 y%y% Bottom Buttons Hidden,WinResize
+  y+=7
+  GUI,%SRE_GUIName%:Add,GroupBox,w260 h140 x225 y%y%
+  y+=16
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,宽度:(&W)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab3_Edit1   gSR_Engine_SaveButtonState
+  y+=36
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,高度:(&H)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab3_Edit2   gSR_Engine_SaveButtonState
+  ; WinMove {{{2
+  y:=yy+94
+  GUI,%SRE_GUIName%:Add,Tab2,w300 h420 x210 y%y% Bottom Buttons Hidden ,WinMove
+  y+=7
+  GUI,%SRE_GUIName%:Add,GroupBox,w260 h140 x225 y%y%
+  y+=16
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,X坐标(&X)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab4_Edit1  gSR_Engine_SaveButtonState
+  y+=36
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,Y坐标(&Y)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab4_Edit2  gSR_Engine_SaveButtonState
+  ; WinMaximize {{{2
+  y:=yy+94
+  GUI,%SRE_GUIName%:Add,Tab2,w300 h420 x210 y%y% Bottom Buttons Hidden,WinMaximize
+  y+=7
+  GUI,%SRE_GUIName%:Add,GroupBox,w260 h180 x225 y%y%
+  y+=16
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,窗口类(&C)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab5_Edit1  gSR_Engine_SaveButtonState
+  y+=36
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,窗口标题:(&T)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab5_Edit2  gSR_Engine_SaveButtonState
+  y+=36
+  GUI,%SRE_GUIName%:Add,CheckBox,h26 x235 y%y% hwndSRE_Tab5_Button  gSR_Engine_SaveButtonState,模糊匹配标题文本(&M)
+  ; WinMinimize {{{2
+  y:=yy+94
+  GUI,%SRE_GUIName%:Add,Tab2,w300 h420 x210 y%y% Bottom Buttons Hidden ,WinMinimize
+  y+=7
+  GUI,%SRE_GUIName%:Add,GroupBox,w260 h180 x225 y%y%
+  y+=16
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,窗口类(&C)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab6_Edit1  gSR_Engine_SaveButtonState
+  y+=36
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,窗口标题:(&T)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab6_Edit2  gSR_Engine_SaveButtonState
+  y+=36
+  GUI,%SRE_GUIName%:Add,CheckBox,h26 x235 y%y% hwndSRE_Tab6_Button  gSR_Engine_SaveButtonState,模糊匹配标题文本(&M)
+  ; WinRestore {{{2
+  y:=yy+94
+  GUI,%SRE_GUIName%:Add,Tab2,w300 h420 x210 y%y% Bottom Buttons Hidden,WinRestore
+  y+=7
+  GUI,%SRE_GUIName%:Add,GroupBox,w260 h180 x225 y%y%
+  y+=16
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,窗口类(&C)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab7_Edit1  gSR_Engine_SaveButtonState
+  y+=36
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,窗口标题:(&T)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab7_Edit2  gSR_Engine_SaveButtonState
+  y+=36
+  GUI,%SRE_GUIName%:Add,CheckBox,h26 x235 y%y% hwndSRE_Tab7_Button  gSR_Engine_SaveButtonState,模糊匹配标题文本(&M)
+  ; AlwaysOnTop {{{2
+  y:=yy+94
+  GUI,%SRE_GUIName%:Add,Tab2,w300 h420 x210 y%y% Bottom Buttons Hidden,AlwaysOnTop
+  y+=7
+  GUI,%SRE_GUIName%:Add,GroupBox,w260 h180 x225 y%y%
+  y+=16
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,窗口类(&C)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab8_Edit1  gSR_Engine_SaveButtonState
+  y+=36
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,窗口标题:(&T)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab8_Edit2  gSR_Engine_SaveButtonState
+  y+=36
+  GUI,%SRE_GUIName%:Add,CheckBox,h26 x235 y%y% hwndSRE_Tab8_Button  gSR_Engine_SaveButtonState,模糊匹配标题文本(&M)
+  ; SendMessage {{{2
+  y:=yy+94
+  GUI,%SRE_GUIName%:Add,Tab2,w300 h420 x210 y%y% Bottom Buttons Hidden,SendMessage
+  y+=7
+  GUI,%SRE_GUIName%:Add,GroupBox,w260 h150 x225 y%y%
+  y+=16
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,窗口类(&C)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab10_Edit1  gSR_Engine_SaveButtonState
+  y+=28
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,窗口标题:(&T)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab10_Edit2  gSR_Engine_SaveButtonState
+  y+=28
+  GUI,%SRE_GUIName%:Add,CheckBox,h26 x235 y%y% hwndSRE_Tab10_Button  gSR_Engine_SaveButtonState,模糊匹配标题文本(&M)
+  y+=45
+  GUI,%SRE_GUIName%:Add,GroupBox,w260 h140 x225 y%y%
+  y+=25
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,消息类型:(&I)
+  y-=3
+  GUI,%SRE_GUIName%:Add,ComboBox,w160 h24 x314 y%y% hwndSRE_Tab10_Edit3 R10  gSR_Engine_SaveButtonState
+  y+=38
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,&WParam:
+  y-=3
+  GUI,%SRE_GUIName%:Add,ComboBox,w160 h24 x314 y%y% hwndSRE_Tab10_Edit4 R5  gSR_Engine_SaveButtonState
+  y+=38
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,&LParam:
+  y-=3
+  GUI,%SRE_GUIName%:Add,ComboBox,w160 h24 x314 y%y% hwndSRE_Tab10_Edit5 R5  gSR_Engine_SaveButtonState
+  ; PostMessage {{{2
+  y:=yy+94
+  GUI,%SRE_GUIName%:Add,Tab2,w300 h420 x210 y%y% Bottom Buttons Hidden,PostMessage
+  y+=7
+  GUI,%SRE_GUIName%:Add,GroupBox,w260 h150 x225 y%y%
+  y+=16
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,窗口类(&C)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab10_Edit1  gSR_Engine_SaveButtonState
+  y+=28
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,窗口标题:(&T)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab10_Edit2  gSR_Engine_SaveButtonState
+  y+=28
+  GUI,%SRE_GUIName%:Add,CheckBox,h26 x235 y%y% hwndSRE_Tab10_Button ,模糊匹配标题文本(&M)
+  y+=45
+  GUI,%SRE_GUIName%:Add,GroupBox,w260 h140 x225 y%y% 
+  y+=25
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,消息类型:(&I)
+  y-=3
+  GUI,%SRE_GUIName%:Add,ComboBox,w160 h24 x314 y%y% hwndSRE_Tab10_Edit3 R10  gSR_Engine_SaveButtonState
+  y+=38
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,&WParam:
+  y-=3
+  GUI,%SRE_GUIName%:Add,ComboBox,w160 h24 x314 y%y% hwndSRE_Tab10_Edit4 R5  gSR_Engine_SaveButtonState
+  y+=38
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,&LParam:
+  y-=3
+  GUI,%SRE_GUIName%:Add,ComboBox,w160 h24 x314 y%y% hwndSRE_Tab10_Edit5 R5  gSR_Engine_SaveButtonState
+  ; Send {{{2
+  y:=yy+94
+  GUI,%SRE_GUIName%:Add,Tab2,w300 h420 x210 y%y% Bottom Buttons Hidden,Send
+  y+=10
+  GUI,%SRE_GUIName%:Add,Text,h26 x225 y%y%,热键列表(&H)
+  y+=25
+  GUI,%SRE_GUIName%:Add,Edit,w260 h270 x225 y%y% hwndSRE_Tab11_Edit1  gSR_Engine_SaveButtonState
+  Gui,%SRE_GUIName%:Tab
+  ; Input {{{2
+  y:=yy+94
+  GUI,%SRE_GUIName%:Add,Tab2,w300 h420 x210 y%y% Bottom Buttons Hidden,Input
+  y+=10
+  GUI,%SRE_GUIName%:Add,Text,h26 x225 y%y%,发送文本(&H)
+  y+=25
+  GUI,%SRE_GUIName%:Add,Edit,w260 h270 x225 y%y% hwndSRE_Tab12_Edit1  gSR_Engine_SaveButtonState
+  ; Click {{{2
+  y:=yy+94
+  GUI,%SRE_GUIName%:Add,Tab2,w300 h420 x210 y%y% Bottom Buttons Hidden ,Click
+  y+=7
+  GUI,%SRE_GUIName%:Add,GroupBox,w260 h240 x225 y%y%
+  y+=16
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,X坐标(&X)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab13_Edit1  gSR_Engine_SaveButtonState
+  y+=36
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,Y坐标(&Y)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab13_Edit2  gSR_Engine_SaveButtonState
+  y+=36
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,次数(&C)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab13_Edit3  gSR_Engine_SaveButtonState
+  y+=36
+  GUI,%SRE_GUIName%:Add,Text,h26 x235 y%y%,按键(&K)
+  y+=20
+  GUI,%SRE_GUIName%:Add,Edit,w240 h24 x235 y%y% hwndSRE_Tab13_Edit4  gSR_Engine_SaveButtonState
+  ; Sleep {{{2
+  y:=yy+94
+  GUI,%SRE_GUIName%:Add,Tab2,w300 h420 x210 y%y% Bottom Buttons Hidden,Sleep
+  y+=10
+  GUI,%SRE_GUIName%:Add,Text,h26 x225 y%y%,等待时间(&T)
+  y+=25
+  GUI,%SRE_GUIName%:Add,Edit,w260 h26 x225 y%y% hwndSRE_Tab14_Edit1  gSR_Engine_SaveButtonState
+  GUI,%SRE_GUIName%:Tab
+  ; Label {{{2
+  y:=yy+94
+  GUI,%SRE_GUIName%:Add,Tab2,w300 h420 x210 y%y% Bottom Buttons Hidden,Label
+  y+=10
+  GUI,%SRE_GUIName%:Add,Text,h26 x225 y%y%,转到Label(&G)
+  y+=25
+  GUI,%SRE_GUIName%:Add,ComboBox,w260 h26 x225 y%y% hwndSRE_Tab15_Edit1 gSR_Engine_SaveButtonState
+  ; Function {{{2
+  y:=yy+94
+  GUI,%SRE_GUIName%:Add,Tab2,w300 h420 x210 y%y% Bottom Buttons Hidden,Function
+  y+=10
+  GUI,%SRE_GUIName%:Add,Text,h26 x225 y%y%,函数名(&F)
+  y+=25
+  GUI,%SRE_GUIName%:Add,ComboBox,w260 h26 x225 y%y% hwndSRE_Tab16_Edit1 gSR_Engine_SaveButtonState
+  GUI,%SRE_GUIName%:Tab
 }
 
 ; SR_Engine_Show(option,title="StarRed Engine") {{{1
@@ -172,43 +425,580 @@ SR_Engine_Show(option="",title="StarRed Engine")
   Global SRE_Object,SRE_GUIName
   SRE_Object := yaml("",False)
   GUI,%SRE_GUIName%:+hwndSRE_Handle
-  GUI,%SRE_GUIName%:Show,w500 h420 %option%,%title%
+  GUI,%SRE_GUIName%:Show,w500 h450 %option%,%title%
 }
-; 界面切换 {{{1
+; SR_Engine_SaveButtonState: {{{1
+SR_Engine_SaveButtonState:
+	SR_Engine_SaveButtonState()
+return
+SR_Engine_SaveButtonState()
+{
+	Global SRE_GUIName,SRE_Button_Save
+	GUI,%SRE_GUIName%:Default
+	GUIControlGet,e,Enabled,%SRE_Button_Save%
+	If not e
+		GUIControl, Enable, %SRE_Button_Save%
+}
+; SR_Engine_SaveModify: {{{1
+SR_Engine_SaveModify:
+  SR_Engine_SaveModify()
+return  
+SR_Engine_SaveModify()
+{
+  Global SRE_GUIName,SRE_DDL_Method,SRE_Button_Save,SRE_SaveObject
+  If not Isobject(SRE_SaveObject)
+    SRE_SaveObject := []
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,choose,,%SRE_DDL_Method%
+  SRE_SaveObject[(idx:=LV_GetNext(0,"Focus"))?idx:1] := SR_Engine_ShowTab%choose%_Save()
+  GUIControl, Disable, %SRE_Button_Save%
+}
+; SR_Engine_LV: {{{1
+SR_Engine_LV:
+  If A_GUIEvent = Normal
+  {
+    GUI,%SRE_GUIName%:Default
+    GUIControlGet,choose,,%SRE_DDL_Method%
+    obj := SRE_SaveObject[A_EventInfo]
+    choose := SRE_Array_method[m:=obj["method"]]
+    SR_Engine_ShowTab%choose%_Load(obj)
+  }
+return
+; SR_Engine_ChangeUI {{{1
+SR_Engine_ChangeUI:
+  SR_Engine_ChangeUI()
+return
+SR_Engine_ChangeUI()
+{
+  Global SRE_GUIName,SRE_DDL_Method
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,choose,,%SRE_DDL_Method%
+  SR_Engine_HideControl()
+  SR_Engine_ShowTab%choose%()
+}
 ; SR_Engine_HideControl() {{{2
-SR_Engine_HideControl()
+SR_Engine_HideControl(idx=0)
 {
   Global SRE_GUIName
   GUI,%SRE_GUIName%:Default
-  GUIControl,Hide,SysTabControl321
-  GUIControl,Hide,SysTabControl322
-}
+  Loop,16
+  {
+  	If A_Index = %idx%
+  	{
+  		GUIControl,Show,SysTabControl32%A_Index%
+  		continue
+  	}
+  	GUIControlGet, v, Visible, SysTabControl32%A_Index%
+  	If v
+  	    GUIControl,Hide,SysTabControl32%A_Index%
+  }
 
+
+}
 ; SR_Engine_ShowTab1() {{{2
 SR_Engine_ShowTab1()
 {
-  Global SRE_GUIName
+  Global SRE_GUIName,SRE_Text_Main
   GUI,%SRE_GUIName%:Default
-  GUIControl,Show,SysTabControl321
+  SR_Engine_HideControl(1)
+  GUIControl,,%SRE_Text_Main%,执行指定的程序或打开文件/文件夹。
 }
 ; SR_Engine_ShowTab1_Save() {{{2
 SR_Engine_ShowTab1_Save()
 {
-  Global SRE_Tab1_Edit1,SRE_Tab1_Edit2,SRE_Tab1_Edit3,SRE_Tab1_DDL
+  Global SRE_GUIName
+        ,SRE_Tab1_Edit1,SRE_Tab1_Edit2,SRE_Tab1_Edit3,SRE_Tab1_DDL
   v := yaml("",0)
   v.add("Method: Run")
   v.add("File: ")
   v.add("Param: ")
   v.add("WorkingDir: ")
-  v.add("State: 2")
-  v.file := "Notepad"
+  v.add("State: ")
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,file,,%SRE_Tab1_Edit1%
+  GUIControlGet,Param,,%SRE_Tab1_Edit2%
+  GUIControlGet,WorkingDir,,%SRE_Tab1_Edit3%
+  GUIControlGet,State,,%SRE_Tab1_DDL%
+  v.file := file
+  v.Param := Param
+  v.WorkingDir := WorkingDir
+  v.State := State-1
   return v
 }
+SR_Engine_ShowTab1_Load(object)
+{
+  Global SRE_GUIName,SRE_DDL_Method
+        ,SRE_Tab1_Edit1,SRE_Tab1_Edit2,SRE_Tab1_Edit3,SRE_Tab1_DDL
+  SR_Engine_ShowTab1()
+  GUI,%SRE_GUIName%:Default
+  GUIControl,Choose,%SRE_DDL_Method%,1
+  file := object.file
+  Param := object.Param
+  WorkingDir := object.WorkingDir
+  State := object.State +1
+  GUIControl,,%SRE_Tab1_Edit1%,%file%
+  GUIControl,,%SRE_Tab1_Edit2%,%Param%
+  GUIControl,,%SRE_Tab1_Edit3%,%WorkingDir%
+  GUIControl,Choose,%SRE_Tab1_DDL%,%State%
+}
+; SR_Engine_ShowTab2() {{{2
+SR_Engine_ShowTab2()
+{
+  Global SRE_GUIName,SRE_Text_Main
+  GUI,%SRE_GUIName%:Default
+  GUIControl,,%SRE_Text_Main%,执行指定的程序或打开文件/文件夹，并等待。
+  SR_Engine_HideControl(1)
+}
+; SR_Engine_ShowTab2_Save() {{{2
+SR_Engine_ShowTab2_Save()
+{
+  Global SRE_GUIName
+        ,SRE_Tab1_Edit1,SRE_Tab1_Edit2,SRE_Tab1_Edit3,SRE_Tab1_DDL
+  v := yaml("",0)
+  v.add("Method: RunWait")
+  v.add("File: ")
+  v.add("Param: ")
+  v.add("WorkingDir: ")
+  v.add("State: ")
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,file,,%SRE_Tab1_Edit1%
+  GUIControlGet,Param,,%SRE_Tab1_Edit2%
+  GUIControlGet,WorkingDir,,%SRE_Tab1_Edit3%
+  GUIControlGet,State,,%SRE_Tab1_DDL%
+  v.file := file
+  v.Param := Param
+  v.WorkingDir := WorkingDir
+  v.State := State-1
+  return v
+}
+; SR_Engine_ShowTab2_Load(Object) {{{2
+SR_Engine_ShowTab2_Load(object)
+{
+	  Global SRE_GUIName,SRE_DDL_Method
+        ,SRE_Tab1_Edit1,SRE_Tab1_Edit2,SRE_Tab1_Edit3,SRE_Tab1_DDL
+      SR_Engine_ShowTab2()
+      GUI,%SRE_GUIName%:Default
+      GUIControl,Choose,%SRE_DDL_Method%,2
+      file := object.file
+      Param := object.Param
+      WorkingDir := object.WorkingDir
+      State := object.State +1
+      GUIControl,,%SRE_Tab1_Edit1%,%file%
+      GUIControl,,%SRE_Tab1_Edit2%,%Param%
+      GUIControl,,%SRE_Tab1_Edit3%,%WorkingDir%
+      GUIControl,Choose,%SRE_Tab1_DDL%,%State%
+}
+; SR_Engine_ShowTab3() {{{2
+SR_Engine_ShowTab3()
+{
+  Global SRE_GUIName,SRE_Text_Main
+  GUI,%SRE_GUIName%:Default
+  GUIControl,,%SRE_Text_Main%,根据指定窗口类或窗口标题激活窗口。
+  SR_Engine_HideControl(2)
+}
+; SR_Engine_ShowTab3_Save() {{{2
+SR_Engine_ShowTab3_Save()
+{
+  Global SRE_GUIName
+        ,SRE_Tab2_Edit1,SRE_Tab2_Edit2,SRE_Tab2_Edit3,SRE_Tab2_Button
+  v := yaml("",0)
+  v.add("Method: WinActivate")
+  v.add("Class: ")
+  v.add("Title: ")
+  v.add("Fuzzy: false")
+  v.add("Wait: 0")
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,class,,%SRE_Tab2_Edit1%
+  GUIControlGet,title,,%SRE_Tab2_Edit2%
+  GUIControlGet,wait,,%SRE_Tab2_Edit3%
+  GUIControlGet,Fuzzy,,%SRE_Tab2_Button%
+  v.Class := Class
+  v.Title := Title
+  v.Fuzzy := Fuzzy
+  v.Wait := Wait
+  return v
+}
+; SR_Engine_ShowTab3_Load(Object) {{{2
+SR_Engine_ShowTab3_Load(object)
+{
+	  Global SRE_GUIName,SRE_DDL_Method
+            ,SRE_Tab2_Edit1,SRE_Tab2_Edit2,SRE_Tab2_Edit3,SRE_Tab2_Button
+      SR_Engine_ShowTab3()
+      GUI,%SRE_GUIName%:Default
+      GUIControl,Choose,%SRE_DDL_Method%,3
+      GUIControl,,%SRE_Tab2_Edit1%,% Object.Class
+      GUIControl,,%SRE_Tab2_Edit2% ,% Object.title
+      GUIControl,,%SRE_Tab2_Edit3%,% Object.Wait
+      GUIControl,,%SRE_Tab2_Button%,% Object.Fuzzy
+}
+; SR_Engine_ShowTab4() {{{2
+SR_Engine_ShowTab4()
+{
+  Global SRE_GUIName,SRE_Text_Main
+  GUI,%SRE_GUIName%:Default
+  GUIControl,,%SRE_Text_Main%,设置当前窗口为指定的宽度和高度
+  SR_Engine_HideControl(3)
+}
+; SR_Engine_ShowTab4_Save() {{{2
+SR_Engine_ShowTab4_Save()
+{
+  Global SRE_GUIName
+        ,SRE_Tab3_Edit1,SRE_Tab3_Edit2
+  v := yaml("",0)
+  v.add("Method: WinResize")
+  v.add("Width: 0")
+  v.add("Height: 0")
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,w,,%SRE_Tab3_Edit1%
+  GUIControlGet,h,,%SRE_Tab3_Edit2%
+  v.Width := w
+  v.Height := h
+  return v
+}
+; SR_Engine_ShowTab5() {{{2
+SR_Engine_ShowTab5()
+{
+  Global SRE_GUIName,SRE_Text_Main
+  GUI,%SRE_GUIName%:Default
+  GUIControl,,%SRE_Text_Main%,移动当前窗口到指定座标
+  SR_Engine_HideControl(4)
+}
+; SR_Engine_ShowTab5_Save() {{{2
+SR_Engine_ShowTab5_Save()
 
+{
+  Global SRE_GUIName
+        ,SRE_Tab4_Edit1,SRE_Tab4_Edit2
+  v := yaml("",0)
+  v.add("Method: WinMove")
+  v.add("x: 0")
+  v.add("y: 0")
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,w,,%SRE_Tab4_Edit1%
+  GUIControlGet,h,,%SRE_Tab4_Edit2%
+  v.x:= w
+  v.y:= h
+  return v
+}
+; SR_Engine_ShowTab6() {{{2
+SR_Engine_ShowTab6()
+{
+  Global SRE_GUIName,SRE_Text_Main
+  GUI,%SRE_GUIName%:Default
+  GUIControl,,%SRE_Text_Main%,最大化指定窗口`n没有指定参数时最大化当前窗口
+  SR_Engine_HideControl(5)
+}
+; SR_Engine_ShowTab6_Save() {{{2
+SR_Engine_ShowTab6_Save()
+{
+  Global SRE_GUIName
+        ,SRE_Tab5_Edit1,SRE_Tab5_Edit2,SRE_Tab5_Button
+  v := yaml("",0)
+  v.add("Method: WinMaximize")
+  v.add("Class: ")
+  v.add("Title: ")
+  v.add("Fuzzy: false")
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,class,,%SRE_Tab5_Edit1%
+  GUIControlGet,title,,%SRE_Tab5_Edit2%
+  GUIControlGet,Fuzzy,,%SRE_Tab5_Button%
+  v.Class := Class
+  v.Title := Title
+  v.Fuzzy := Fuzzy
+  return v
+}
+; SR_Engine_ShowTab7() {{{2
+SR_Engine_ShowTab7()
+{
+  Global SRE_GUIName,SRE_Text_Main
+  GUI,%SRE_GUIName%:Default
+  GUIControl,,%SRE_Text_Main%,最小化指定窗口`n没有指定参数时最小化当前窗口
+  SR_Engine_HideControl(6)
+}
+; SR_Engine_ShowTab7_Save() {{{2
+SR_Engine_ShowTab7_Save()
+{
+  Global SRE_GUIName
+        ,SRE_Tab6_Edit1,SRE_Tab6_Edit2,SRE_Tab6_Button
+  v := yaml("",0)
+  v.add("Method: WinMinimize")
+  v.add("Class: ")
+  v.add("Title: ")
+  v.add("Fuzzy: false")
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,class,,%SRE_Tab6_Edit1%
+  GUIControlGet,title,,%SRE_Tab6_Edit2%
+  GUIControlGet,Fuzzy,,%SRE_Tab6_Button%
+  v.Class := Class
+  v.Title := Title
+  v.Fuzzy := Fuzzy
+  return v
+}
+; SR_Engine_ShowTab8() {{{2
+SR_Engine_ShowTab8()
+{
+  Global SRE_GUIName,SRE_Text_Main
+  GUI,%SRE_GUIName%:Default
+  GUIControl,,%SRE_Text_Main%,还原指定的窗口`n如果无指定内容则还原当前窗口
+  SR_Engine_HideControl(7)
+}
+; SR_Engine_ShowTab8_Save() {{{2
+SR_Engine_ShowTab8_Save()
+{
+  Global SRE_GUIName
+        ,SRE_Tab7_Edit1,SRE_Tab7_Edit2,SRE_Tab7_Button
+  v := yaml("",0)
+  v.add("Method: WinRestore")
+  v.add("Class: ")
+  v.add("Title: ")
+  v.add("Fuzzy: false")
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,class,,%SRE_Tab7_Edit1%
+  GUIControlGet,title,,%SRE_Tab7_Edit2%
+  GUIControlGet,Fuzzy,,%SRE_Tab7_Button%
+  v.Class := Class
+  v.Title := Title
+  v.Fuzzy := Fuzzy
+  return v
+}
+; SR_Engine_ShowTab9() {{{2
+SR_Engine_ShowTab9()
+{
+  Global SRE_GUIName,SRE_Text_Main
+  GUI,%SRE_GUIName%:Default
+  GUIControl,,%SRE_Text_Main%,设置/取消置顶指定窗口
+  SR_Engine_HideControl(8)
+}
+; SR_Engine_ShowTab9_Save() {{{2
+SR_Engine_ShowTab9_Save()
+{
+  Global SRE_GUIName
+        ,SRE_Tab8_Edit1,SRE_Tab8_Edit8,SRE_Tab8_Button
+  v := yaml("",0)
+  v.add("Method: AlwaysOnTop")
+  v.add("Class: ")
+  v.add("Title: ")
+  v.add("Fuzzy: false")
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,class,,%SRE_Tab8_Edit1%
+  GUIControlGet,title,,%SRE_Tab8_Edit2%
+  GUIControlGet,Fuzzy,,%SRE_Tab8_Button%
+  v.Class := Class
+  v.Title := Title
+  v.Fuzzy := Fuzzy
+  return v
+}
+; SR_Engine_ShowTab10() {{{2
+SR_Engine_ShowTab10()
+{
+  Global SRE_GUIName,SRE_Text_Main
+  GUI,%SRE_GUIName%:Default
+  GUIControl,,%SRE_Text_Main%,向指定窗口发送消息(SendMessage)。
+  SR_Engine_HideControl(9)
+}
+; SR_Engine_ShowTab10_Save() {{{2
+SR_Engine_ShowTab10_Save()
+{
+  Global SRE_GUIName
+        ,SRE_Tab9_Edit1,SRE_Tab9_Edit2,SRE_Tab9_Buttnn,SRE_Tab9_Edit3,SRE_Tab9_Edit4,SRE_Tab9_Edit5
+  v := yaml("",0)
+  v.add("Method: SendMessage")
+  v.add("Class: ")
+  v.add("Title: ")
+  v.add("Fuzzy: 0")
+  v.add("Message: ")
+  v.add("WParam: ")
+  v.add("LParam: ")
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,class,,%SRE_Tab9_Edit1%
+  GUIControlGet,title,,%SRE_Tab9_Edit2%
+  GUIControlGet,Fuzzy,,%SRE_Tab9_Button%
+  GUIControlGet,msg,,%SRE_Tab9_Edit1%
+  GUIControlGet,wp,,%SRE_Tab9_Edit2%
+  GUIControlGet,lp,,%SRE_Tab9_Edit1%
+  v.Class := Class
+  v.Title := Title
+  v.Fuzzy := Fuzzy
+  v.Message := msg
+  v.WParam := wp
+  v.LParam := lp
+  return v
+}
+; SR_Engine_ShowTab11() {{{2
+SR_Engine_ShowTab11()
+{
+  Global SRE_GUIName,SRE_Text_Main
+  GUI,%SRE_GUIName%:Default
+  GUIControl,,%SRE_Text_Main%,向指定窗口提交消息(PostMessage)。
+  SR_Engine_HideControl(10)
+}
+; SR_Engine_ShowTab11_Save() {{{2
+SR_Engine_ShowTab11_Save()
+{
+  Global SRE_GUIName
+        ,SRE_Tab10_Edit1,SRE_Tab10_Edit2,SRE_Tab10_Buttnn,SRE_Tab10_Edit3,SRE_Tab10_Edit4,SRE_Tab10_Edit5
+  v := yaml("",0)
+  v.add("Method: PostMessage")
+  v.add("Class: ")
+  v.add("Title: ")
+  v.add("Fuzzy: 0")
+  v.add("Message: ")
+  v.add("WParam: ")
+  v.add("LParam: ")
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,class,,%SRE_Tab10_Edit1%
+  GUIControlGet,title,,%SRE_Tab10_Edit2%
+  GUIControlGet,Fuzzy,,%SRE_Tab10_Button%
+  GUIControlGet,msg,,%SRE_Tab10_Edit1%
+  GUIControlGet,wp,,%SRE_Tab10_Edit2%
+  GUIControlGet,lp,,%SRE_Tab10_Edit1%
+  v.Class := Class
+  v.Title := Title
+  v.Fuzzy := Fuzzy
+  v.Message := msg
+  v.WParam := wp
+  v.LParam := lp
+  return v
+}
+; SR_Engine_ShowTab12() {{{2
+SR_Engine_ShowTab12()
+{
+  Global SRE_GUIName,SRE_Text_Main
+  GUI,%SRE_GUIName%:Default
+  GUIControl,,%SRE_Text_Main%,发送连续的热键
+  SR_Engine_HideControl(11)
+}
+; SR_Engine_ShowTab12_Save() {{{2
+SR_Engine_ShowTab12_Save()
+{
+  Global SRE_GUIName
+        ,SRE_Tab11_Edit1
+  v := yaml("",0)
+  v.add("Method: Send")
+  v.add("Hotkey: ")
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,hks,,%SRE_Tab11_Edit1%
+  v.Hotkey := hks
+  return v
+}
+; SR_Engine_ShowTab13() {{{2
+SR_Engine_ShowTab13()
+{
+  Global SRE_GUIName,SRE_Text_Main
+  GUI,%SRE_GUIName%:Default
+  GUIControl,,%SRE_Text_Main%,发送文本到当前窗口
+  SR_Engine_HideControl(12)
+}
+; SR_Engine_ShowTab13_Save() {{{2
+SR_Engine_ShowTab13_Save()
+{
+  Global SRE_GUIName
+        ,SRE_Tab12_Edit1
+  v := yaml("",0)
+  v.add("Method: Input")
+  v.add("String: ")
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,str,,%SRE_Tab12_Edit1%
+  v.String := str
+  return v
+}
+; SR_Engine_ShowTab14() {{{2
+SR_Engine_ShowTab14()
+{
+  Global SRE_GUIName,SRE_Text_Main
+  GUI,%SRE_GUIName%:Default
+  GUIControl,,%SRE_Text_Main%,模拟鼠标点击
+  SR_Engine_HideControl(13)
+}
+; SR_Engine_ShowTab14_Save() {{{2
+SR_Engine_ShowTab14_Save()
+{
+  Global SRE_GUIName
+        ,SRE_Tab13_Edit1,SRE_Tab13_Edit2,SRE_Tab13_Edit3,SRE_Tab13_Edit4
+  v := yaml("",0)
+  v.add("Method: Click")
+  v.add("x: ")
+  v.add("y: ")
+  v.add("count: ")
+  v.add("key: ")
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,x,,%SRE_Tab13_Edit1%
+  GUIControlGet,y,,%SRE_Tab13_Edit2%
+  GUIControlGet,c,,%SRE_Tab13_Edit3%
+  GUIControlGet,k,,%SRE_Tab13_Edit4%
+  v.x := x
+  v.y := y
+  v.count := c
+  v.key := k
+  return v
+}
+; SR_Engine_ShowTab15() {{{2
+SR_Engine_ShowTab15()
+{
+  Global SRE_GUIName,SRE_Text_Main
+  GUI,%SRE_GUIName%:Default
+  GUIControl,,%SRE_Text_Main%,等待一段时间(单位为ms)
+  SR_Engine_HideControl(14)
+}
+; SR_Engine_ShowTab15_Save() {{{2
+SR_Engine_ShowTab15_Save()
+{
+  Global SRE_GUIName
+        ,SRE_Tab14_Edit1
+  v := yaml("",0)
+  v.add("Method: Sleep")
+  v.add("Time: ")
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,t,,%SRE_Tab14_Edit1%
+  v.Time := t
+  return v
+}
+; SR_Engine_ShowTab16() {{{2
+SR_Engine_ShowTab16()
+{
+  Global SRE_GUIName,SRE_Text_Main
+  GUI,%SRE_GUIName%:Default
+  GUIControl,,%SRE_Text_Main%,跳转到指定的Label
+  SR_Engine_HideControl(15)
+}
+; SR_Engine_ShowTab16_Save() {{{2
+SR_Engine_ShowTab16_Save()
+{
+  Global SRE_GUIName
+        ,SRE_Tab15_Edit1
+  v := yaml("",0)
+  v.add("Method: Label")
+  v.add("Sub: ")
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,s,,%SRE_Tab15_Edit1%
+  v.Sub := t
+  return v
+}
+; SR_Engine_ShowTab17() {{{2
+SR_Engine_ShowTab17()
+{
+  Global SRE_GUIName,SRE_Text_Main
+  GUI,%SRE_GUIName%:Default
+  GUIControl,,%SRE_Text_Main%,执行指定的函数
+  SR_Engine_HideControl(16)
+}
+; SR_Engine_ShowTab17_Save() {{{2
+SR_Engine_ShowTab17_Save()
+{
+  Global SRE_GUIName
+        ,SRE_Tab16_Edit1
+  v := yaml("",0)
+  v.add("Method: Function")
+  v.add("Name: ")
+  GUI,%SRE_GUIName%:Default
+  GUIControlGet,f,,%SRE_Tab16_Edit1%
+  v.Name := f
+  return v
+}
 ; SR_Engine_Interpret(String,Save) {{{1
 ; 适用于Run/RunWait
 ; 解析内容,返回解析完成的新内容
-SR_Engine_Interpret(String,Save,Func=False)
+SR_Engine_Interpret(String,Save,GoFunc=false,byRef Obj="")
 {
 /*
 Save
@@ -254,7 +1044,7 @@ Save
 				RtString := boxswitch(box)
       If RegExMatch(switch,"i)\{date[^\{\}]*\}",date)
 				RtString := dateswitch(date)
-      If Func
+      If GoFunc
       {
 			  If RegExMatch(switch,"i)\{func:([^\{\}]*)\}",Func)
 			  {
@@ -282,6 +1072,8 @@ Save
 		Else
 			Break
 	}
+  obj["Method"] := "Run"
+  obj["File"] := RunString
   Return RunString
 }
 ; dateswitch(switch) {{{2
@@ -690,7 +1482,6 @@ fileSwitch(FileList,switch){
                 LoopListCount++
             }
         }
-;        Msgbox % LoopList
         Temp := SubStr(Temp,7,Strlen(Temp)-7)
         Loop,Parse,LoopList,`n
         {
@@ -951,7 +1742,7 @@ SR_Engine_Exec(Object)
     SR_Save := []
   If RegExMatch(Object.Method,"i)^Run$")
   {
-    Target := Object.file Object.Param
+    Target := Object.file " " Object.Param
     wDir := Object.WorkingDir
     If Object.State = 1
       Run,%Target%,%wDir%,Min UseErrorLevel
@@ -964,7 +1755,7 @@ SR_Engine_Exec(Object)
   }
   If RegExMatch(Object.Method,"i)^RunWait$")
   {
-    Target := Object.file Object.Param
+    Target := Object.file " " Object.Param
     wDir := Object.WorkingDir
     If Object.State = 1
       RunWait,%Target%,%wDir%,Min UseErrorLevel
@@ -1010,7 +1801,10 @@ SR_Engine_Exec(Object)
         SetTitleMatchMode, 2
       }
       t := Object.Title
-      WinMaximize,%t%
+      If strlen(t)
+        WinMaximize,%t%
+      Else
+        WinMaximize,A
       If Object.Fuzzy
         SetTitleMatchMode, %TMM%
     }
@@ -1027,7 +1821,10 @@ SR_Engine_Exec(Object)
         SetTitleMatchMode, 2
       }
       t := Object.Title
-      WinMinimize,%t%
+      If strlen(t)
+        WinMinimize,%t%
+      Else
+        WinMinimize,A
       If Object.Fuzzy
         SetTitleMatchMode, %TMM%
     }
@@ -1035,15 +1832,7 @@ SR_Engine_Exec(Object)
   If RegExMatch(Object.Method,"i)^WinRestore$")
   {
     If Strlen(c:=Object.Class)
-    {
       WinRestore,ahk_class %c%
-      WinGet,hwnd,ID,ahk_class %c%
-      x := SR_Save[hwnd A_Tab "x"]
-      y := SR_Save[hwnd A_Tab "y"]
-      w := SR_Save[hwnd A_Tab "w"]
-      h := SR_Save[hwnd A_Tab "h"]
-      WinMove,ahk_class %c%,, %x%, %y%, %w%, %h%
-    }
     Else
     {
       If Object.Fuzzy
@@ -1052,13 +1841,10 @@ SR_Engine_Exec(Object)
         SetTitleMatchMode, 2
       }
       t := Object.Title
-      WinRestore,%t%
-      WinGet,hwnd,ID,%t%
-      x := SR_Save[hwnd A_Tab "x"]
-      y := SR_Save[hwnd A_Tab "y"]
-      w := SR_Save[hwnd A_Tab "w"]
-      h := SR_Save[hwnd A_Tab "h"]
-      WinMove,%t%,, %x%, %y%, %w%, %h%
+      If strlen(t)
+        WinRestore,%t%
+      Else
+        WinRestore,A
       If Object.Fuzzy
         SetTitleMatchMode, %TMM%
     }
@@ -1087,7 +1873,7 @@ SR_Engine_Exec(Object)
     y := Object.y
     WinMove,ahk_id %hwnd%,, %x%, %y%
   }
-  If RegExMatch(Object.Method,"i)^AlwayOnTop$")
+  If RegExMatch(Object.Method,"i)^AlwaysOnTop$")
   {
     If Strlen(c:=Object.Class)
       WinSet,AlwaysOnTop,Toggle,ahk_class %c%
@@ -1099,7 +1885,10 @@ SR_Engine_Exec(Object)
         SetTitleMatchMode, 2
       }
       t := Object.Title
-      WinSet,AlwaysOnTop,Toggle,%t%
+      If strlen(t)
+        WinSet,AlwaysOnTop,Toggle,%t%
+      Else
+        WinSet,AlwaysOnTop,Toggle,A
       If Object.Fuzzy
         SetTitleMatchMode, %TMM%
     }
@@ -1125,12 +1914,13 @@ SR_Engine_Exec(Object)
   }
   If RegExMatch(Object.Method,"i)^Send$")
   {
-    Loop
+    hks := Object.Hotkey
+    Loop,Parse,hks,`n
     {
-      If Not Strlen(Object["HK" A_Index])
-        Break
-      s := Object["HK" A_Index]
-      Send,%s%
+      If RegExMatch(A_LoopField,"^\{([\d]*)\}$",s)
+        Sleep,%s1%
+      Else
+        Send,%A_LoopField%
     }
   }
   If RegExMatch(Object.Method,"i)^SendMessage$")
@@ -1148,7 +1938,10 @@ SR_Engine_Exec(Object)
         SetTitleMatchMode, 2
       }
       t := Object.Title
-      SendMessage, Msg , wParam, lParam, , %t%
+      If Strlen(t)
+        SendMessage, Msg , wParam, lParam, , %t%
+      Else
+        SendMessage, Msg , wParam, lParam, , A
       If Object.fuzzy
         SetTitleMatchMode, %TMM%
     }
@@ -1169,7 +1962,10 @@ SR_Engine_Exec(Object)
         SetTitleMatchMode, 2
       }
       t := Object.Title
-      PostMessage, Msg , wParam, lParam, , %t%
+      If strlen(t)
+        PostMessage, Msg , wParam, lParam, , %t%
+      Else
+        PostMessage, Msg , wParam, lParam, , A
       If Object.fuzzy
         SetTitleMatchMode, %TMM%
     }
